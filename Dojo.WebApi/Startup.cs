@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Dojo.Business;
 using Swashbuckle.AspNetCore.Swagger;
 using Microsoft.EntityFrameworkCore;
+using Dojo.Authorization;
 
 namespace Dojo.WebApi
 {
@@ -19,6 +20,7 @@ namespace Dojo.WebApi
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
                 .AddEnvironmentVariables();
+
             Configuration = builder.Build();
         }
 
@@ -28,6 +30,8 @@ namespace Dojo.WebApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<SecurityContext>(opt => opt.UseInMemoryDatabase());
+
+            services.AddCustomAuthentication();
 
             // Register the Swagger generator, defining one or more Swagger documents
             services.AddSwaggerGen(c =>
@@ -40,7 +44,7 @@ namespace Dojo.WebApi
         }
         
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, ICustomAuthenticationService customAuthenticationService)
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
@@ -48,11 +52,13 @@ namespace Dojo.WebApi
             var db = app.ApplicationServices.GetService<SecurityContext>();
             CreateData(db);
 
+            app.UseSimpleAuthentication();
+
             app.UseMvcWithDefaultRoute();
 
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();
-
+            
             // Enable middleware to serve swagger-ui (HTML, JS, CSS etc.), specifying the Swagger JSON endpoint.
             app.UseSwaggerUI(c =>
             {

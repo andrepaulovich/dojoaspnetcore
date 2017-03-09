@@ -17,7 +17,8 @@
     "Microsoft.Extensions.Options.ConfigurationExtensions": "1.0.0",
     "Microsoft.EntityFrameworkCore.InMemory": "1.1.1",
     "Dojo.Business": "1.0.0-*",
-    "Swashbuckle.AspNetCore": "1.0.0-rc3"
+    "Swashbuckle.AspNetCore": "1.0.0-rc3",
+    "Dojo.Authorization": "1.0.0-*"
   },
 
   "tools": {
